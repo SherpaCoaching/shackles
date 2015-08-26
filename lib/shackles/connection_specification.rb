@@ -3,7 +3,7 @@ require 'i18n/core_ext/hash' unless Hash.method_defined?(:deep_symbolize_keys)
 module Shackles
   module ConnectionSpecification
     class CacheCoherentHash < Hash
-      def initialize(spec)
+      def initialize(spec=nil)
         @spec = spec
         super
       end
@@ -11,7 +11,9 @@ module Shackles
       def []=(key, value)
         super
         @spec.instance_variable_set(:@current_config, nil)
-        @spec.instance_variable_get(:@config)[key] = value
+        config = @spec.instance_variable_get(:@config)
+        @spec.instance_variable_set(:@config, Hash.new) if config.nil?
+        config[key] = value
       end
 
       def delete(key)
